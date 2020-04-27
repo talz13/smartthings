@@ -60,9 +60,9 @@ def handleUrlCallback () {
         	def data = null
             
         	switch (type) {
-            	case "oor": data = [presence: "not present"]; break
-                case "back_in_range": data = [presence: "present"]; break
-                case "motion_detected": data = [acceleration: "active", motion: "active"]; startMotionTimer(d); break
+            	// case "oor": data = [presence: "not present"]; break
+                // case "back_in_range": data = [presence: "present"]; break
+                // case "motion_detected": data = [acceleration: "active", motion: "active"]; startMotionTimer(d); break
                 
                 // motion timeout callback is not working currently in WST 
                 // case "motion_timedout": data = [acceleration: "inactive", motion: "inactive"]; break
@@ -147,7 +147,11 @@ def wirelessDeviceList()
         }
         section("Optional Settings", hidden: true, hideable: true) {
             input "pollTimer", "number", title:"Minutes between poll updates of the sensors", defaultValue:5
-        } 
+        }
+        section([mobileOnly:true]) {
+        	paragraph "If you have more than 5 or 6 sensors, you may need to create multiple instances of this SmartApp with only about 5 devices selected in each instance. Use a unique name here to create multiple apps."
+			label title: "Assign a name for this SmartApp instance (optional)", required: false
+		}
 	}
 
 	return p
@@ -421,18 +425,22 @@ def pollSingle(def child) {
 def updateDeviceStatus(def device, def d) {
     def tagEventStates = getEventStates()
 
+    log.debug "device info: ${device}"
+
     // parsing data here
     def data = [
         tagType: convertTagTypeToString(device),
-        temperature: device.temperature.toDouble().round(),
-        rssi: ((Math.max(Math.min(device.signaldBm, -60),-100)+100)*100/40).toDouble().round(),
-        presence: ((device.OutOfRange == true) ? "not present" : "present"),
+        //temperature: device.temperature.toDouble().round(),
+        temperature: device.temperature.toDouble().round(2),
+        //rssi: ((Math.max(Math.min(device.signaldBm, -60),-100)+100)*100/40).toDouble().round(),
+        //presence: ((device.OutOfRange == true) ? "not present" : "present"),
         battery: (device.batteryVolt*100/3).toDouble().round(),
-        switch: ((device.lit == true) ? "on" : "off"),
+        //switch: ((device.lit == true) ? "on" : "off"),
         humidity: (device.cap).toDouble().round(),
+        illuminance: (device.lux).toDouble().round(),
         contact : (tagEventStates[device.eventState] == "Opened") ? "open" : "closed",
-        acceleration  : (tagEventStates[device.eventState] == "Moved") ? "active" : "inactive",
-        motion : (tagEventStates[device.eventState] == "Moved") ? "active" : "inactive",
+        //acceleration  : (tagEventStates[device.eventState] == "Moved") ? "active" : "inactive",
+        //motion : (tagEventStates[device.eventState] == "Moved") ? "active" : "inactive",
         water : (device.shorted == true) ? "wet" : "dry" 
     ]
     d.generateEvent(data)
@@ -603,12 +611,19 @@ def setupCallbacks(def child, def tag) {
             String message = """{"id":${id},
             	"config":{
                 "__type":"MyTagList.EventURLConfig",
+                "door_opened":${setSingleCallback(tag, respMap.d?.door_opened, "door_opened")},
+                "door_closed":${setSingleCallback(tag, respMap.d?.door_closed, "door_closed")},
+                "water_detected":${setSingleCallback(tag, respMap.d?.water_detected, "water_detected")},
+                "water_dried":${setSingleCallback(tag, respMap.d?.water_dried, "water_dried")}
+                },
+                "applyAll":false}"""
+                
+                // Remove these events from setting URL callbacks in Wireless Tag config:
+                /*
                 "oor":${setSingleCallback(tag, respMap.d?.oor, "oor")},
                 "back_in_range":${setSingleCallback(tag, respMap.d?.back_in_range, "back_in_range")},
                 "low_battery":${useExitingCallback(respMap.d?.low_battery)},
                 "motion_detected":${setSingleCallback(tag, respMap.d?.motion_detected, "motion_detected")},
-                "door_opened":${setSingleCallback(tag, respMap.d?.door_opened, "door_opened")},
-                "door_closed":${setSingleCallback(tag, respMap.d?.door_closed, "door_closed")},
                 "door_open_toolong":${useExitingCallback(respMap.d?.door_open_toolong)},
                 "temp_toohigh":${useExitingCallback(respMap.d?.temp_toohigh)},
                 "temp_toolow":${useExitingCallback(respMap.d?.temp_toolow)},
@@ -616,11 +631,8 @@ def setupCallbacks(def child, def tag) {
                 "cap_normal":${useExitingCallback(respMap.d?.cap_normal)},
                 "too_dry":${useExitingCallback(respMap.d?.too_dry)},
                 "too_humid":${useExitingCallback(respMap.d?.too_humid)},
-                "water_detected":${setSingleCallback(tag, respMap.d?.water_detected, "water_detected")},
-                "water_dried":${setSingleCallback(tag, respMap.d?.water_dried, "water_dried")},
                 "motion_timedout":${setSingleCallback(tag, respMap.d?.motion_timedout, "motion_timedout")}
-                },
-                "applyAll":false}"""
+                */
                 
             postMessage("/ethClient.asmx/SaveEventURLConfig", message)
             
@@ -662,6 +674,7 @@ def light(def child, def on, def flash) {
     return null
 }
 
+/*
 def startMotionTimer(def child) {   
 	log.trace "start motion timer"
 
@@ -707,6 +720,7 @@ def motionTimerHander() {
     }
 }
 
+/ *
 def resMotionDetection(def child) {
 	log.trace "turning off motion"
     
@@ -794,6 +808,7 @@ def setMotionMode(def child, def mode, def timeDelay) {
     
     return null    
 }
+*/
 
 def getTagID(def uuid) {
 	
@@ -808,6 +823,9 @@ def getTagUUID(def id) {
 def getTagTypeInfo(def tag) {
 	Map tagInfo = [:]
 
+    log.debug "tag: ${tag}"
+    log.debug "tag.tagType: ${tag.tagType}"
+
 	tagInfo.isMsTag = (tag.tagType == 12 || tag.tagType == 13);
 	tagInfo.isMoistureTag = (tag.tagType == 32 || tag.tagType == 33);
 	tagInfo.hasBeeper = (tag.tagType == 13 || tag.tagType == 12);
@@ -815,6 +833,7 @@ def getTagTypeInfo(def tag) {
 	tagInfo.isPIR = (tag.tagType == 72);
 	tagInfo.isKumostat = (tag.tagType == 62);
 	tagInfo.isHTU = (tag.tagType == 52 || tag.tagType == 62 || tag.tagType == 72 || tag.tagType == 13);
+    tagInfo.isLux = (tag.tagType == 26);
     
     return tagInfo
 } 
@@ -859,6 +878,9 @@ def convertTagTypeToString(def tag) {
         case 33:
         	tagString = "Moisture"
             break;     
+        case 26:
+            tagString = "Lux"
+            break;
 	}
 
 	return tagString + getTagVersion(tag)
