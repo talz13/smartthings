@@ -1,5 +1,5 @@
 /**
- *  Wireless Tag Water
+ *  Wireless Tag Generic
  *
  *  Copyright 2014 Dave Swanson (swanny)
  *
@@ -13,13 +13,15 @@
  *  for the specific language governing permissions and limitations under the License.
  */
 metadata {
-    definition (name: 'Wireless Tag Water', namespace: 'swanny', author: 'swanny') {
+    definition (name: 'Wireless Tag Generic', namespace: 'swanny', author: 'swanny') {
         capability 'Water Sensor'
         capability 'Relative Humidity Measurement'
         capability 'Temperature Measurement'
+        capability 'Illuminance Measurement'
         capability 'Battery'
         capability 'Refresh'
         capability 'Polling'
+        capability 'Sensor'
 
         command 'generateEvent'
         command 'initialSetup'

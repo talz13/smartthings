@@ -1,0 +1,14 @@
+{
+    "extends": "recommended",
+    "rules": {
+        "DuplicateStringLiteral": {
+            "enabled": false
+        },
+        "LineLength": {
+            "enabled": false
+        },
+        "MethodCount": {
+            "enabled": false
+        }
+    }
+}
