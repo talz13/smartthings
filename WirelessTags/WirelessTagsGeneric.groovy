@@ -14,7 +14,6 @@
  */
 metadata {
     definition (name: 'Wireless Tag Generic', namespace: 'swanny', author: 'swanny') {
-        capability 'Water Sensor'
         capability 'Relative Humidity Measurement'
         capability 'Temperature Measurement'
         capability 'Illuminance Measurement'
