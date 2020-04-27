@@ -15,24 +15,24 @@
  */
 metadata {
 	definition (name: "Wireless Tag Motion", namespace: "swanny", author: "swanny") {
-		capability "Presence Sensor"
-		capability "Acceleration Sensor"
-        capability "Motion Sensor"
+		// capability "Presence Sensor"
+		// capability "Acceleration Sensor"
+        // capability "Motion Sensor"
 		capability "Tone"
 		capability "Relative Humidity Measurement"
 		capability "Temperature Measurement"
-		capability "Signal Strength"
+		// capability "Signal Strength"
 		capability "Battery"
         capability "Refresh"
         capability "Polling"
-        capability "Switch"
+        // capability "Switch"
         capability "Contact Sensor"
         
         command "generateEvent"
-        command "setMotionModeAccel"
-        command "setMotionModeDoor"
-        command "setMotionModeDisarm"
-        command "setDoorClosedPosition"
+        //command "setMotionModeAccel"
+        //command "setMotionModeDoor"
+        //command "setMotionModeDisarm"
+        //command "setDoorClosedPosition"
         command "initialSetup"
         
         attribute "tagType","string"
@@ -44,6 +44,7 @@ metadata {
 	}
 
 	tiles {
+    	/*
 		standardTile("acceleration", "device.acceleration") {
 			state("active", label:'${name}', icon:"st.motion.acceleration.active", backgroundColor:"#53a7c0")
 			state("inactive", label:'${name}', icon:"st.motion.acceleration.inactive", backgroundColor:"#ffffff")
@@ -52,6 +53,7 @@ metadata {
 			state("active", label:'${name}', icon:"st.motion.motion.active", backgroundColor:"#53a7c0")
 			state("inactive", label:'${name}', icon:"st.motion.motion.inactive", backgroundColor:"#ffffff")
 		}
+        */
 		valueTile("temperature", "device.temperature") {
 			state("temperature", label:'${currentValue}°',
 				backgroundColors:[
@@ -68,9 +70,12 @@ metadata {
         valueTile("humidity", "device.humidity", inactiveLabel: false) {
 			state "humidity", label:'${currentValue}% humidity', unit:""
 		}
+        /*
 		valueTile("rssi", "device.rssi", inactiveLabel: false, decoration: "flat") {
 			state "rssi", label:'${currentValue}% signal', unit:""
 		}
+        */
+        /*
         standardTile("presence", "device.presence", canChangeBackground: true) {
 			state "present", labelIcon:"st.presence.tile.present", backgroundColor:"#53a7c0"
 			state "not present", labelIcon:"st.presence.tile.not-present", backgroundColor:"#ffffff"
@@ -78,12 +83,14 @@ metadata {
 		standardTile("beep", "device.beep", decoration: "flat") {
 			state "beep", label:'', action:"tone.beep", icon:"st.secondary.beep", backgroundColor:"#ffffff"
 		}
+        */
 		valueTile("battery", "device.battery", decoration: "flat", inactiveLabel: false) {
 			state "battery", label:'${currentValue}% battery', unit:"V"
 		}
 		standardTile("refresh", "device.temperature", inactiveLabel: false, decoration: "flat") {
 			state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
+        /*
         standardTile("button", "device.switch") {
 			state "off", label: 'Off', action: "switch.on", icon: "st.switches.light.off", backgroundColor: "#ffffff", nextState: "on"
 			state "on", label: 'On', action: "switch.off", icon: "st.switches.light.on", backgroundColor: "#79b821", nextState: "off"
@@ -91,10 +98,12 @@ metadata {
 		valueTile("type", "device.tagType", decoration: "flat") {
 			state "default", label:'${currentValue}'
 		}
+        */
         standardTile("contact", "device.contact") {
 			state("open", label:'${name}', icon:"st.contact.contact.open", backgroundColor:"#ffa81e")
 			state("closed", label:'${name}', icon:"st.contact.contact.closed", backgroundColor:"#79b821")
 		}
+        /*
         valueTile("doorClosed", "device.motionMode", inactiveLabel: false, decoration: "flat") {
 			state ("accel", label:'Motion Mode:  ${currentValue}', action:"setMotionModeAccel", nextState: "door")
             state ("door", label:'Motion Mode:  ${currentValue}', action:"setMotionModeDoor", nextState: "disarmed")
@@ -103,8 +112,13 @@ metadata {
 		valueTile("setdoorclosed", "device.temperature", inactiveLabel: false, decoration: "flat") {
 			state "default", label:'Arm & Set Door Closed Position', action:"setDoorClosedPosition", nextState: "default"
 		}
-		main(["temperature", "acceleration", "motion", "presence", "humidity", "contact"])
-		details(["temperature", "presence", "humidity", "acceleration", "motion", "contact", "button", "refresh", "type", "doorClosed", "setdoorclosed", "beep", "rssi", "battery"])
+        */
+		//main(["temperature", "acceleration", "motion", "presence", "humidity", "contact"])
+        //main(["temperature", "acceleration", "motion", "humidity", "contact"])
+        main(["temperature", "humidity", "contact"])
+		//details(["temperature", "presence", "humidity", "acceleration", "motion", "contact", "button", "refresh", "type", "doorClosed", "setdoorclosed", "beep", "rssi", "battery"])
+        //details(["temperature", "humidity", "acceleration", "motion", "contact", "refresh", "type", "doorClosed", "setdoorclosed", "beep", "rssi", "battery"])
+        details(["temperature", "humidity", "contact", "refresh", "battery"])
 	}
     
     preferences {
@@ -114,15 +128,15 @@ metadata {
 
 // parse events into attributes
 def parse(String description) {
-	log.debug "Parsing '${description}'"
+	//log.debug "Parsing '${description}'"
 }
 
 // handle commands
+/*
 def beep() {
 	log.debug "Executing 'beep'"
     parent.beep(this, 3)
 }
-
 def on() {
 	log.debug "Executing 'on'"
     parent.light(this, true, false)
@@ -134,6 +148,7 @@ def off() {
     parent.light(this, false, false)
     sendEvent(name: "switch", value: "off")
 }
+*/
 
 void poll() {
 	log.debug "poll"	
@@ -145,6 +160,7 @@ def refresh() {
     parent.refreshChild(this)
 }
 
+/*
 def setMotionModeAccel() {
 	log.debug "set to door"
     def newMode = "door"
@@ -171,10 +187,13 @@ def setDoorClosedPosition() {
     parent.disarmMotion(this)
     parent.armMotion(this)
 }
+*/
 
 def initialSetup() {
+	/*
 	sendEvent(name: "motionMode", value: "accel")
     parent.setMotionMode(this, "accel", getMotionDecay())
+    */
 }
 
 def getMotionDecay() {
@@ -189,7 +208,7 @@ def updated() {
 
 void generateEvent(Map results)
 {
-	log.debug "parsing data $results"
+	//log.debug "parsing data $results"
     
    	if(results)
 	{
@@ -214,11 +233,12 @@ void generateEvent(Map results)
 }
 
 def getTemperature(value) {
-	def celsius = value
+    def returnVal = value
+    //log.debug("Temperature value: ${value}")
 	if(getTemperatureScale() == "C"){
-		return celsius
+        returnVal = value
 	} else {
-		return celsiusToFahrenheit(celsius) as Integer
+        returnVal = (celsiusToFahrenheit(value) as Float)
 	}
+    return returnVal.round(1)
 }
-
