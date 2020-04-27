@@ -133,4 +133,3 @@ def getTemperature(value) {
 		return celsiusToFahrenheit(celsius) as Integer
 	}
 }
-
