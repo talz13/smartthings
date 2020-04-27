@@ -2,27 +2,13 @@
 
 The Wireless Sensor Tags integration connects securely to your www.mytaglist.com account securely using OAuth2. Once attached, the SmartApp gets a list of the tags you have in your account. You can then choose which tags you want to create as SmartThings devices. The  SmartApp currently creates the devices as a Motion Device Type or a Water Device Type.
 
-Motion Device Features:
+Generic Device Features:
 
 * Temperature 
-* Presence (out of range)
 * Humidity (shows as zero on tags that don't support humidity)
-* Movement (Acceleration) or Open/Close - you choose which mode inside the app
-* Set Door Closed position
-* Light on/off (using the device switch)
-* Beep
-* Refresh & Poll
-* Signal Strength
-* Battery Level
-
-Water devices support (untested):
-
 * Wet/Dry
-* Humidity
-* Temperature 
-* Presence (out of range)
+* Illuminance
 * Refresh & Poll
-* Signal Strength
 * Battery Level
 
 Other tag types will be created as Motion Devices and should support whatever functionality they have in common with the motion tags. 
