@@ -49,24 +49,45 @@ void initialSetup() {
 }
 
 void generateEvent(Map results) {
-    log.debug "parsing data $results"
+    // log.debug "parsing data $results"
+
     if (results) {
         results.each { name, value ->
-            boolean isDisplayed = true
+            valueUnit = null
 
+            switch (name) {
+                case 'battery':
+                case 'humidity':
+                    valueUnit = '%'
+                    break
+                case 'illuminance':
+                    valueUnit = 'Lux'
+                    break
+            }
             if (name == 'temperature') {
                 double tempValue = getTemperature(value)
-                // def isChange = isTemperatureStateChange(device, name, tempValue.toString())
-                isDisplayed = isChange
-                if (device.currentState(name)?.value != tempValue) {
-                    sendEvent(name: name, value: tempValue, unit: getTemperatureScale(), displayed: isDisplayed)
+                boolean isChange = isStateChange(device, name, tempValue.toString())
+                // log.debug "name: $name, isChange: $isChange"
+                // if (device.currentState(name)?.value != tempValue) {
+                if (isChange) {
+                    sendEvent(name: name, value: tempValue, unit: getTemperatureScale(), isStateChange: isChange, displayed: isChange)
                 }
             }
             else {
                 boolean isChange = isStateChange(device, name, value.toString())
-                isDisplayed = isChange
-                if (device.currentState(name)?.value != value) {
-                    sendEvent(name: name, value: value, isStateChange: isChange, displayed: isDisplayed)
+                // log.debug "name: $name, isChange: $isChange"
+                // log.debug "Previous: ${device.currentState(name)?.value}, New: $value"
+                // if (device.currentState(name)?.value == value) {
+                //     log.debug "It shouldn't be a state change..."
+                // }
+                // if (device.currentState(name)?.value != value) {
+                if (isChange) {
+                    // log.debug "It's a state change!"
+                    if (valueUnit) {
+                        sendEvent(name: name, value: value, unit: valueUnit, isStateChange: isChange, displayed: isChange)
+                    } else {
+                        sendEvent(name: name, value: value, isStateChange: isChange, displayed: isChange)
+                    }
                 }
             }
         }
@@ -74,12 +95,11 @@ void generateEvent(Map results) {
 }
 
 double getTemperature(double value) {
-    float returnVal = value
-    //log.debug("Temperature value: ${value}")
+    double returnVal = value
     if (getTemperatureScale() == 'C') {
         returnVal = value
     } else {
-        returnVal = (celsiusToFahrenheit(value) as Float)
+        returnVal = (celsiusToFahrenheit(value) as double)
     }
     return returnVal.round(1)
 }
